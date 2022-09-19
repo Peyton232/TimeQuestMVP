@@ -1,0 +1,101 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://assets/Art/Bat/Bat.png" type="Texture" id=1]
+[ext_resource path="res://src/Actors/Bat/Bat.gd" type="Script" id=2]
+[ext_resource path="res://assets/Art/Shadows/SmallShadow.png" type="Texture" id=3]
+[ext_resource path="res://src/Actors/Overlaps/HurtBox.tscn" type="PackedScene" id=4]
+[ext_resource path="res://src/Actors/Stats.tscn" type="PackedScene" id=5]
+[ext_resource path="res://src/Actors/PlayerDetectionZone.tscn" type="PackedScene" id=6]
+[ext_resource path="res://src/Actors/Overlaps/HitBox.tscn" type="PackedScene" id=7]
+[ext_resource path="res://src/Actors/WanderController.tscn" type="PackedScene" id=8]
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 1 )
+region = Rect2( 16, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 1 )
+region = Rect2( 48, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 0, 16, 24 )
+
+[sub_resource type="SpriteFrames" id=7]
+animations = [ {
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ) ],
+"loop": true,
+"name": "fly",
+"speed": 10.0
+} ]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 5.0
+
+[sub_resource type="CircleShape2D" id=8]
+radius = 100.0
+
+[sub_resource type="CircleShape2D" id=9]
+radius = 6.0
+
+[node name="Bat" type="KinematicBody2D"]
+collision_layer = 16
+collision_mask = 17
+script = ExtResource( 2 )
+
+[node name="Sprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0, -5 )
+frames = SubResource( 7 )
+animation = "fly"
+frame = 1
+playing = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, 8 )
+shape = SubResource( 1 )
+
+[node name="Shadow" type="Sprite" parent="."]
+position = Vector2( 0, 9 )
+texture = ExtResource( 3 )
+
+[node name="HurtBox" parent="." instance=ExtResource( 4 )]
+collision_layer = 8
+
+[node name="CollisionShape2D" parent="HurtBox" index="0"]
+position = Vector2( 0, -6 )
+scale = Vector2( 0.8, 0.35 )
+
+[node name="Stats" parent="." instance=ExtResource( 5 )]
+max_health = 2
+
+[node name="PlayerDetectionZone" parent="." instance=ExtResource( 6 )]
+
+[node name="CollisionShape2D" parent="PlayerDetectionZone" index="0"]
+self_modulate = Color( 1, 1, 1, 0.184314 )
+shape = SubResource( 8 )
+
+[node name="HitBox" parent="." instance=ExtResource( 7 )]
+collision_mask = 4
+damage = 1
+
+[node name="CollisionShape2D" parent="HitBox" index="0"]
+modulate = Color( 0.988235, 0, 0, 1 )
+position = Vector2( 0, -5 )
+shape = SubResource( 9 )
+
+[node name="WanderController" parent="." instance=ExtResource( 8 )]
+
+[connection signal="area_entered" from="HurtBox" to="." method="_on_HurtBox_area_entered"]
+[connection signal="no_health" from="Stats" to="." method="_on_Stats_no_health"]
+
+[editable path="HurtBox"]
+[editable path="PlayerDetectionZone"]
+[editable path="HitBox"]
